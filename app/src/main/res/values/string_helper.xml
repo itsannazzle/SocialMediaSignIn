@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="helper_password">Password minimum 8 character, contain upper case letters, digits and special character</string>
+    <string name="helper_email">Must contain @brins.co.id</string>
+    <string name="helper_blank">Field cannot be blank</string>
+</resources>

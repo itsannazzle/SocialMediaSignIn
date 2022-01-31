@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "681566217322",
+    "project_id": "authlogin-b88a7",
+    "storage_bucket": "authlogin-b88a7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:681566217322:android:b73d104276d2dd09d15613",
+        "android_client_info": {
+          "package_name": "com.example.myloginapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "681566217322-gnt7rr01g40rmse468dg547s34na1u8n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-OWqKdLHeWH5gNQLKAcro-WEFajdjFNo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "681566217322-gnt7rr01g40rmse468dg547s34na1u8n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

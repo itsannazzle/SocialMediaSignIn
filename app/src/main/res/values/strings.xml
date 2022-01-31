@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">My Login App</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login">Login</string>
+    <string name="brins">\@brins.co.id</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="continue_text">Continue</string>
+    <string name="enter_your_otp">Enter your OTP</string>
+    <string name="verify_otp">Verify OTP</string>
+    <string name="otp">OTP</string>
+    <string name="don_t_have_account_register_here">Don\'t have account? Register here</string>
+    <string name="register">Register</string>
+    <string name="your_otp_is">Your OTP is %1$s</string>
+    <string name="com.twitter.sdk.android.CONSUMER_KEY">tCGnrwCjW63ob2owaLrBoRvBj</string>
+    <string name="com.twitter.sdk.android.CONSUMER_SECRET">Tfea6aY8j3mZW0YxiKt2rKQ9PkVa3ut1QDw4N1F50qsgBQAPTD</string>
+    <string name="logout">Logout</string>
+</resources>
