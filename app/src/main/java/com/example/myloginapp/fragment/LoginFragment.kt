@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.myloginapp.activity.MainActivity
 import com.example.myloginapp.constant.STRING_BUNDLE_USERNAME
 import com.example.myloginapp.databinding.FragmentLoginBinding
 import com.example.myloginapp.dialog.InstagramAuthenticationDialog
@@ -29,17 +30,14 @@ import com.linecorp.linesdk.Scope
 import com.linecorp.linesdk.auth.LineAuthenticationParams
 import com.linecorp.linesdk.auth.LineLoginResult
 import com.twitter.sdk.android.core.*
+import com.twitter.sdk.android.core.TwitterCore
+import com.twitter.sdk.android.core.identity.TwitterAuthClient
+import com.twitter.sdk.android.core.internal.TwitterSessionVerifier
 import com.twitter.sdk.android.core.models.User
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.util.*
-import com.twitter.sdk.android.core.TwitterException
-
-import com.twitter.sdk.android.core.services.AccountService
-
-import com.twitter.sdk.android.core.TwitterCore
-
-import com.twitter.sdk.android.core.TwitterApiClient
-import retrofit2.Call
 
 
 class LoginFragment : Fragment(), InstagramAuthenticationInterface
@@ -97,6 +95,7 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
             {
                 val sessionTwitter = TwitterCore.getInstance().sessionManager.activeSession
                 sessionTwitter(sessionTwitter)
+
                 if (sessionTwitter != null)
                 {
                     getUserEmailTwitter(sessionTwitter)
@@ -112,18 +111,19 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
     }
 
     private fun getUserEmailTwitter(twitterSession: TwitterSession) {
-        TwitterApiClient(twitterSession).accountService.verifyCredentials(false,false,true).enqueue(object : Callback<User>()
-        {
-            override fun success(result: Result<User>?) {
-                result?.data?.email
-                result?.data
-            }
+            TwitterApiClient(twitterSession).accountService.verifyCredentials(false,false,true).enqueue(object : Callback<User>()
+            {
+                override fun success(result: Result<User>?) {
+                    result?.data?.email
+                    result?.data
+                }
 
-            override fun failure(exception: TwitterException?) {
-                exception?.message
-                Log.d("Anna","1failure ${exception?.message}")
-            }
-        })
+                override fun failure(exception: TwitterException?) {
+                    exception?.message
+                    Log.d("Anna","1failure ${exception?.message}")
+                }
+            })
+
     }
 
 
@@ -208,14 +208,14 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
             this?.setLoginDelegate(loginDelegate)
             this?.addLoginListener(object : LoginListener {
                 override fun onLoginSuccess(result: LineLoginResult) {
-                    Toast.makeText(getContext(), "Login success", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Login success", Toast.LENGTH_SHORT).show()
                     val bundle = Bundle()
                     bundle.putString(STRING_BUNDLE_USERNAME,result.lineIdToken?.email)
                     replaceFragment(requireFragmentManager(),HomeFragment(),bundle)
                 }
 
                 override fun onLoginFailure(result: LineLoginResult?) {
-                    Toast.makeText(getContext(), "Login failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Login failed", Toast.LENGTH_SHORT).show()
                 }
             })
         }
