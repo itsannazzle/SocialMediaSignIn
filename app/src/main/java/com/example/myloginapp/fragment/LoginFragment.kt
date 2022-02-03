@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,8 +23,23 @@ import com.example.myloginapp.model.instagrammodel.InstagramUsernameRequestModel
 import com.example.myloginapp.model.instagrammodel.InstragramAccessTokenRequestModel
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
+import com.linecorp.linesdk.LoginDelegate
+import com.linecorp.linesdk.LoginListener
+import com.linecorp.linesdk.Scope
+import com.linecorp.linesdk.auth.LineAuthenticationParams
+import com.linecorp.linesdk.auth.LineLoginResult
 import com.twitter.sdk.android.core.*
+import com.twitter.sdk.android.core.models.User
 import org.json.JSONObject
+import java.util.*
+import com.twitter.sdk.android.core.TwitterException
+
+import com.twitter.sdk.android.core.services.AccountService
+
+import com.twitter.sdk.android.core.TwitterCore
+
+import com.twitter.sdk.android.core.TwitterApiClient
+import retrofit2.Call
 
 
 class LoginFragment : Fragment(), InstagramAuthenticationInterface
@@ -66,6 +82,9 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
     {
         val bundle = Bundle()
         bundle.putString(STRING_BUNDLE_USERNAME,sessionTwitter.userName)
+        sessionTwitter.authToken.token
+        sessionTwitter.authToken.secret
+
         replaceFragment(requireFragmentManager(),HomeFragment(),bundle)
     }
 
@@ -78,14 +97,35 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
             {
                 val sessionTwitter = TwitterCore.getInstance().sessionManager.activeSession
                 sessionTwitter(sessionTwitter)
+                if (sessionTwitter != null)
+                {
+                    getUserEmailTwitter(sessionTwitter)
+                } else {
+                    Toast.makeText(requireContext(),"Session is null",Toast.LENGTH_LONG).show()
+                }
             }
-
             override fun failure(exception: TwitterException?)
             {
                 Toast.makeText(requireContext(),"Login failed. $exception",Toast.LENGTH_LONG).show()
             }
         }
     }
+
+    private fun getUserEmailTwitter(twitterSession: TwitterSession) {
+        TwitterApiClient(twitterSession).accountService.verifyCredentials(false,false,true).enqueue(object : Callback<User>()
+        {
+            override fun success(result: Result<User>?) {
+                result?.data?.email
+                result?.data
+            }
+
+            override fun failure(exception: TwitterException?) {
+                exception?.message
+                Log.d("Anna","1failure ${exception?.message}")
+            }
+        })
+    }
+
 
     //endregion
 
@@ -123,6 +163,7 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
     {
         _instagramGraphRequestModel.AccessToken = responseModel.access_token
         _instagramGraphRequestModel.IdUser = responseModel.user_id
+        Log.d("Anna",responseModel.user_id.toString())
         val responseUsername = _instagramGraphRequestModel.requestUsername()
         if (responseUsername != null) {
             val bundle = Bundle()
@@ -140,10 +181,43 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
     {
         _instagramInstagramAuthenticationDialog = context?.let { InstagramAuthenticationDialog(it) }!!
         _instagramInstagramAuthenticationDialog.instagramAuthenticationDialog(instagramAuthenticationInterface = this)
-        _getBindingLoginFragment?.imageButtonLinkedIn?.setOnClickListener()
+        _getBindingLoginFragment?.imageButtonLoginInstagram?.setOnClickListener()
         {
             _instagramInstagramAuthenticationDialog.setCancelable(true)
             _instagramInstagramAuthenticationDialog.show()
+        }
+    }
+
+    //endregion
+
+
+    //region LINELOGIN
+
+    private fun loginWithLine()
+    {
+        val loginDelegate = LoginDelegate.Factory.create()
+        with(_getBindingLoginFragment?.buttonLoginLine)
+        {
+            this?.setFragment(this@LoginFragment)
+            this?.setChannelId(LINE_CHANNEL_ID)
+            this?.enableLineAppAuthentication(true)
+            this?.setAuthenticationParams(
+                LineAuthenticationParams.Builder()
+                .scopes(Arrays.asList(Scope.OPENID_CONNECT, Scope.OC_EMAIL))
+                    .build())
+            this?.setLoginDelegate(loginDelegate)
+            this?.addLoginListener(object : LoginListener {
+                override fun onLoginSuccess(result: LineLoginResult) {
+                    Toast.makeText(getContext(), "Login success", Toast.LENGTH_SHORT).show();
+                    val bundle = Bundle()
+                    bundle.putString(STRING_BUNDLE_USERNAME,result.lineIdToken?.email)
+                    replaceFragment(requireFragmentManager(),HomeFragment(),bundle)
+                }
+
+                override fun onLoginFailure(result: LineLoginResult?) {
+                    Toast.makeText(getContext(), "Login failed", Toast.LENGTH_SHORT).show();
+                }
+            })
         }
     }
 
@@ -174,6 +248,7 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
 
         loginInstagram()
 
+        loginWithLine()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

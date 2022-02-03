@@ -8,10 +8,13 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myloginapp.R
+import com.example.myloginapp.constant.STRING_BUNDLE_USERNAME
 import com.example.myloginapp.databinding.ActivityMainBinding
 import com.example.myloginapp.extentions.replaceFragment
 import com.example.myloginapp.fragment.HomeFragment
 import com.example.myloginapp.fragment.LoginFragment
+import com.linecorp.linesdk.LineApiResponseCode
+import com.linecorp.linesdk.auth.LineLoginApi
 import com.twitter.sdk.android.core.*
 
 
@@ -63,6 +66,17 @@ class MainActivity : AppCompatActivity()
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         _fragmentLogin._getBindingLoginFragment?.buttonTwitter?.onActivityResult(requestCode, resultCode, data)
+        val lineLoginResult = LineLoginApi.getLoginResultFromIntent(data)
+        when(lineLoginResult.responseCode)
+        {
+            LineApiResponseCode.SUCCESS -> {
+                val bundle = Bundle()
+                bundle.putString(STRING_BUNDLE_USERNAME, lineLoginResult.lineIdToken?.email)
+                replaceFragment(supportFragmentManager,HomeFragment(),bundle)
+            }
+            LineApiResponseCode.CANCEL -> Toast.makeText(this,"Login cancel by user",Toast.LENGTH_LONG).show()
+
+        }
     }
 
     override fun onUserInteraction() {
