@@ -50,4 +50,5 @@ dependencies {
     implementation 'com.twitter.sdk.android:twitter-core:3.3.0'
     implementation 'com.twitter.sdk.android:twitter:3.3.0'
     implementation 'com.linecorp:linesdk:5.0.1'
+    implementation 'com.bytedance.ies.ugc.aweme:opensdk-oversea-external:0.2.0.2'
 }

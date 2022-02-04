@@ -10,6 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.bytedance.sdk.open.tiktok.TikTokOpenApiFactory
+import com.bytedance.sdk.open.tiktok.api.TikTokOpenApi
+import com.bytedance.sdk.open.tiktok.authorize.model.Authorization
 import com.example.myloginapp.activity.MainActivity
 import com.example.myloginapp.constant.STRING_BUNDLE_USERNAME
 import com.example.myloginapp.databinding.FragmentLoginBinding
@@ -163,7 +166,7 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
     {
         _instagramGraphRequestModel.AccessToken = responseModel.access_token
         _instagramGraphRequestModel.IdUser = responseModel.user_id
-        Log.d("Anna",responseModel.user_id.toString())
+
         val responseUsername = _instagramGraphRequestModel.requestUsername()
         if (responseUsername != null) {
             val bundle = Bundle()
@@ -219,6 +222,20 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
                 }
             })
         }
+    }
+
+    //endregion
+
+
+    //region TIKTOKLOGIN
+    private fun loginWithTikTok()
+    {
+        val tikTokOpenApi = TikTokOpenApiFactory.create(requireActivity())
+        val authRequest = Authorization.Request()
+        authRequest.scope = "user.info.basic"
+        authRequest.state = "xxx"
+
+        tikTokOpenApi.authorize(authRequest)
     }
 
     //endregion
