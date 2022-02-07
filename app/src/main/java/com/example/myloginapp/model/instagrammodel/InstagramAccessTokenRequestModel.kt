@@ -15,25 +15,36 @@ class InstragramAccessTokenRequestModel
     var code : String? = null
         )
 {
-    fun requestAccessToken() : InstagramAccessTokenResponseModel?
+    fun requestAccessToken(model: InstragramAccessTokenRequestModel) : InstagramAccessTokenResponseModel?
     {
+        with(this)
+        {
+            client_id = model.client_id
+            client_secret = model.client_secret
+            grant_type = model.grant_type
+            redirect_uri = model.redirect_uri
+            code = model.code
+        }
+
         val field: MutableList<RequestValueModel> = ArrayList<RequestValueModel>()
         field.add(RequestValueModel(INSTAGRAM_CLIENT_ID,client_id))
         field.add(RequestValueModel(INSTAGRAM_CLIENT_SECRET,client_secret))
         field.add(RequestValueModel(INSTAGRAM_GRANT_TYPE,grant_type))
         field.add(RequestValueModel(INSTAGRAM_REDIRECT_URI,redirect_uri))
         field.add(RequestValueModel(INSTAGRAM_CODE,code))
-        var modelInstagramAccessTokenResponse : InstagramAccessTokenResponseModel? = InstagramAccessTokenResponseModel()
-        runBlocking()
-        {
-           launch (Dispatchers.IO)
-           {
-               modelInstagramAccessTokenResponse =
-                   WebService.requestAccessTokenInstagram(STRING_INSTAGRAM_AUTH_ACCESS_TOKEN_URL,field,
+//        var modelInstagramAccessTokenResponse : InstagramAccessTokenResponseModel? = InstagramAccessTokenResponseModel()
+//        runBlocking()
+//        {
+//           launch (Dispatchers.IO)
+//           {
+//               modelInstagramAccessTokenResponse =
+//                   WebService.requestAccessTokenInstagram(STRING_INSTAGRAM_AUTH_ACCESS_TOKEN_URL,field,
+//                       STRING_FORM_URL_ENCODED)
+//           }
+//        }
+//        return modelInstagramAccessTokenResponse
+        return WebService.requestAccessTokenInstagram(STRING_INSTAGRAM_AUTH_ACCESS_TOKEN_URL,field,
                        STRING_FORM_URL_ENCODED)
-           }
-        }
-        return modelInstagramAccessTokenResponse
     }
 }
 

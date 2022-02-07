@@ -10,6 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.bytedance.sdk.open.tiktok.TikTokOpenApiFactory
 import com.bytedance.sdk.open.tiktok.api.TikTokOpenApi
 import com.bytedance.sdk.open.tiktok.authorize.model.Authorization
@@ -25,6 +28,7 @@ import com.example.myloginapp.model.UserModel
 import com.example.myloginapp.model.instagrammodel.InstagramAccessTokenResponseModel
 import com.example.myloginapp.model.instagrammodel.InstagramUsernameRequestModel
 import com.example.myloginapp.model.instagrammodel.InstragramAccessTokenRequestModel
+import com.example.myloginapp.viewmodel.InstagramViewModel
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import com.linecorp.linesdk.LoginDelegate
@@ -59,6 +63,7 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
     private var _counter = 0
     private val _handler = Handler (Looper.getMainLooper())
     private lateinit var _instagramInstagramAuthenticationDialog : InstagramAuthenticationDialog
+    private lateinit var _viewModelInstagram : InstagramViewModel
 
     //endregion
 
@@ -71,6 +76,7 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
     ): View?
     {
         _bindingLoginFragment = FragmentLoginBinding.inflate(layoutInflater, container, false)
+        _viewModelInstagram = ViewModelProvider(this)[InstagramViewModel::class.java]
         return _getBindingLoginFragment?.root
     }
 
@@ -137,47 +143,64 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
 
     override fun onCodeReceived(accessToken : String)
     {
-        requestAccessToken(accessToken)
+
+        _instagramAccessTokenReqModel.client_id = INSTAGRAM_CONSUMER_KEY
+        _instagramAccessTokenReqModel.client_secret = INSTAGRAM_CONSUMER_KEY_SECRET
+        _instagramAccessTokenReqModel.grant_type = STRING_INSTAGRAM_GRANT_TYPE
+        _instagramAccessTokenReqModel.redirect_uri = STRING_INSTAGRAM_REDIRECT_URL
+        _instagramAccessTokenReqModel.code = accessToken
+        _viewModelInstagram.requestAccessToken(_instagramAccessTokenReqModel)
+        requestUsername()
         _getBindingLoginFragment?.progressBarLogin?.visibility = View.VISIBLE
     }
 
 
-    private fun requestAccessToken(stringCode : String)
+
+/*    private fun requestAccessToken(stringCode : String)
     {
         _instagramAccessTokenReqModel.client_id = INSTAGRAM_CONSUMER_KEY
         _instagramAccessTokenReqModel.client_secret = INSTAGRAM_CONSUMER_KEY_SECRET
         _instagramAccessTokenReqModel.grant_type = STRING_INSTAGRAM_GRANT_TYPE
         _instagramAccessTokenReqModel.redirect_uri = STRING_INSTAGRAM_REDIRECT_URL
         _instagramAccessTokenReqModel.code = stringCode
-        val accessToken = _instagramAccessTokenReqModel.requestAccessToken()
-        if (accessToken != null)
-        {
-            requestUsername(accessToken)
-        } else
-        {
-            Toast.makeText(requireContext(),"Request token error",Toast.LENGTH_LONG).show()
-            _getBindingLoginFragment?.progressBarLogin?.visibility = View.GONE
-        }
+        //val accessToken = _instagramAccessTokenReqModel.requestAccessToken()
+        // _viewModelInstagram.requestAccessToken()
+        _viewModelInstagram._getModelInstagramAccessTokenResponse.observe(viewLifecycleOwner,
+            {
+                if (it != null)
+                {
+                    requestUsername(it)
+                } else
+                {
+                    Toast.makeText(requireContext(),"Request token error",Toast.LENGTH_LONG).show()
+                    _getBindingLoginFragment?.progressBarLogin?.visibility = View.GONE
+                }
+            })
 
 
-    }
 
-    private fun requestUsername(responseModel: InstagramAccessTokenResponseModel)
+    }*/
+
+    private fun requestUsername()
     {
-        _instagramGraphRequestModel.AccessToken = responseModel.access_token
-        _instagramGraphRequestModel.IdUser = responseModel.user_id
+        _viewModelInstagram._getModelInstagramAccessTokenResponse.observe(viewLifecycleOwner,
+            {
+                _instagramGraphRequestModel.AccessToken = it?.access_token
+                _instagramGraphRequestModel.IdUser = it?.user_id
 
-        val responseUsername = _instagramGraphRequestModel.requestUsername()
-        if (responseUsername != null) {
-            val bundle = Bundle()
-            bundle.putString(STRING_BUNDLE_USERNAME, responseUsername.username)
-            replaceFragment(requireFragmentManager(), HomeFragment(), bundle)
-            _getBindingLoginFragment?.progressBarLogin?.visibility = View.GONE
-        } else
-        {
-            _getBindingLoginFragment?.progressBarLogin?.visibility = View.GONE
-            Toast.makeText(requireContext(),"Request username error",Toast.LENGTH_LONG).show()
-        }
+                val responseUsername = _instagramGraphRequestModel.requestUsername()
+                if (responseUsername != null) {
+                    val bundle = Bundle()
+                    bundle.putString(STRING_BUNDLE_USERNAME, responseUsername.username)
+                    replaceFragment(requireFragmentManager(), HomeFragment(), bundle)
+                    _getBindingLoginFragment?.progressBarLogin?.visibility = View.GONE
+                } else
+                {
+                    _getBindingLoginFragment?.progressBarLogin?.visibility = View.GONE
+                    Toast.makeText(requireContext(),"Request username error",Toast.LENGTH_LONG).show()
+                }
+            })
+
     }
 
     private fun loginInstagram()
