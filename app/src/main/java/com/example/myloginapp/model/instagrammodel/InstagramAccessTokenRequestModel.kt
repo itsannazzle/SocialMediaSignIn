@@ -32,17 +32,7 @@ class InstragramAccessTokenRequestModel
         field.add(RequestValueModel(INSTAGRAM_GRANT_TYPE,grant_type))
         field.add(RequestValueModel(INSTAGRAM_REDIRECT_URI,redirect_uri))
         field.add(RequestValueModel(INSTAGRAM_CODE,code))
-//        var modelInstagramAccessTokenResponse : InstagramAccessTokenResponseModel? = InstagramAccessTokenResponseModel()
-//        runBlocking()
-//        {
-//           launch (Dispatchers.IO)
-//           {
-//               modelInstagramAccessTokenResponse =
-//                   WebService.requestAccessTokenInstagram(STRING_INSTAGRAM_AUTH_ACCESS_TOKEN_URL,field,
-//                       STRING_FORM_URL_ENCODED)
-//           }
-//        }
-//        return modelInstagramAccessTokenResponse
+
         return WebService.requestAccessTokenInstagram(STRING_INSTAGRAM_AUTH_ACCESS_TOKEN_URL,field,
                        STRING_FORM_URL_ENCODED)
     }

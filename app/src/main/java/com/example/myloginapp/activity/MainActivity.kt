@@ -70,6 +70,7 @@ class MainActivity : AppCompatActivity()
         when(lineLoginResult.responseCode)
         {
             LineApiResponseCode.SUCCESS -> {
+                lineLoginResult.lineProfile
                 val bundle = Bundle()
                 bundle.putString(STRING_BUNDLE_USERNAME, lineLoginResult.lineIdToken?.email)
                 replaceFragment(supportFragmentManager,HomeFragment(),bundle)

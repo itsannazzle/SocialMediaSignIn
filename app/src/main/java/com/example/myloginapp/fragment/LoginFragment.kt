@@ -143,7 +143,6 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
 
     override fun onCodeReceived(accessToken : String)
     {
-
         _instagramAccessTokenReqModel.client_id = INSTAGRAM_CONSUMER_KEY
         _instagramAccessTokenReqModel.client_secret = INSTAGRAM_CONSUMER_KEY_SECRET
         _instagramAccessTokenReqModel.grant_type = STRING_INSTAGRAM_GRANT_TYPE
@@ -156,50 +155,32 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
 
 
 
-/*    private fun requestAccessToken(stringCode : String)
-    {
-        _instagramAccessTokenReqModel.client_id = INSTAGRAM_CONSUMER_KEY
-        _instagramAccessTokenReqModel.client_secret = INSTAGRAM_CONSUMER_KEY_SECRET
-        _instagramAccessTokenReqModel.grant_type = STRING_INSTAGRAM_GRANT_TYPE
-        _instagramAccessTokenReqModel.redirect_uri = STRING_INSTAGRAM_REDIRECT_URL
-        _instagramAccessTokenReqModel.code = stringCode
-        //val accessToken = _instagramAccessTokenReqModel.requestAccessToken()
-        // _viewModelInstagram.requestAccessToken()
-        _viewModelInstagram._getModelInstagramAccessTokenResponse.observe(viewLifecycleOwner,
-            {
-                if (it != null)
-                {
-                    requestUsername(it)
-                } else
-                {
-                    Toast.makeText(requireContext(),"Request token error",Toast.LENGTH_LONG).show()
-                    _getBindingLoginFragment?.progressBarLogin?.visibility = View.GONE
-                }
-            })
-
-
-
-    }*/
-
     private fun requestUsername()
     {
-        _viewModelInstagram._getModelInstagramAccessTokenResponse.observe(viewLifecycleOwner,
-            {
-                _instagramGraphRequestModel.AccessToken = it?.access_token
-                _instagramGraphRequestModel.IdUser = it?.user_id
+        _viewModelInstagram._getModelInstagramAccessTokenResponse.observe(viewLifecycleOwner
+        ) { response ->
+            if (response != null) {
+                _instagramGraphRequestModel.AccessToken = response.access_token
+                _instagramGraphRequestModel.IdUser = response.user_id
+
 
                 val responseUsername = _instagramGraphRequestModel.requestUsername()
+
                 if (responseUsername != null) {
                     val bundle = Bundle()
                     bundle.putString(STRING_BUNDLE_USERNAME, responseUsername.username)
                     replaceFragment(requireFragmentManager(), HomeFragment(), bundle)
                     _getBindingLoginFragment?.progressBarLogin?.visibility = View.GONE
-                } else
-                {
+                } else {
                     _getBindingLoginFragment?.progressBarLogin?.visibility = View.GONE
-                    Toast.makeText(requireContext(),"Request username error",Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), "Request username error", Toast.LENGTH_LONG)
+                        .show()
                 }
-            })
+            } else {
+                Toast.makeText(requireContext(), "Access token is null", Toast.LENGTH_LONG).show()
+            }
+
+        }
 
     }
 
@@ -234,14 +215,14 @@ class LoginFragment : Fragment(), InstagramAuthenticationInterface
             this?.setLoginDelegate(loginDelegate)
             this?.addLoginListener(object : LoginListener {
                 override fun onLoginSuccess(result: LineLoginResult) {
-                    Toast.makeText(getContext(), "Login success", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Login success", Toast.LENGTH_SHORT).show()
                     val bundle = Bundle()
                     bundle.putString(STRING_BUNDLE_USERNAME,result.lineIdToken?.email)
                     replaceFragment(requireFragmentManager(),HomeFragment(),bundle)
                 }
 
                 override fun onLoginFailure(result: LineLoginResult?) {
-                    Toast.makeText(getContext(), "Login failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Login failed", Toast.LENGTH_SHORT).show()
                 }
             })
         }
